@@ -1,19 +1,22 @@
-<button id="init_sub">Подписаться на уведомления</button> // Кнопка подписки
+<button id="init_sub">Подписаться на уведомления</button>
+
+<script src="https://pxl.demo.altcraft.com/ak_container.js?id=NjI1fDQ="></script>
 
 <script>
-	document.getElementById('init_sub').addEventListener('click', function() { // По клику на кнопку..
-	try {
-		var akPush = new AKPush();
-		aKPush.initSubscription(
-    {           
-    },
-    {
-        CRM_ID: 'abc'
-    }
-) 
-	catch (e) {
-		console.log(e); // В случае ошибки выведет сообщение в консоль
-		}
-	});
-	<script src="https://pxl.demo.altcraft.com/ak_container.js?id=NjI1fDQ=" ></script>
+    document.getElementById('init_sub').addEventListener('click', function() {
+        try {
+            var akPush = new AKPush();
+
+            akPush.initSubscription(
+                {},
+                {
+                    CRM_ID: 'abc'
+                }
+            );
+        } catch (e) {
+            console.log(e);
+        }
+    });
 </script>
+
+<a href="books.html">Перейти к книгам</a>
