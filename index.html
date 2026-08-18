@@ -1,22 +1,201 @@
-<button id="init_sub">Подписаться на уведомления</button>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<script src="https://pxl.demo.altcraft.com/ak_container.js?id=NjI1fDQ="></script>
+    <title>Тестовый сайт Altcraft</title>
 
-<script>
-    document.getElementById('init_sub').addEventListener('click', function() {
-        try {
-            var akPush = new AKPush();
+    <!-- ========================= -->
+    <!-- Altcraft Tag Manager -->
+    <!-- ========================= -->
+    <script>
+        (function (window, document, dataLayerName, containerID) {
+            window[dataLayerName] = window[dataLayerName] || [];
 
-            akPush.initSubscription(
-                {},
-                {
-                    CRM_ID: 'abc'
-                }
-            );
-        } catch (e) {
-            console.log(e);
+            window[dataLayerName].push({
+                'start': new Date().getTime(),
+                event: 'actm-js'
+            });
+
+            var firstScript = document.getElementsByTagName('script')[0];
+            var script = document.createElement('script');
+
+            var dl = dataLayerName !== 'acDataLayer'
+                ? '&l=' + dataLayerName
+                : '';
+
+            script.async = true;
+
+            script.src =
+                'https://pxl.demo.altcraft.com/actm/js/actm.js?id='
+                + containerID
+                + dl;
+
+            script.type = 'module';
+
+            if (firstScript && firstScript.parentNode) {
+                firstScript.parentNode.insertBefore(
+                    script,
+                    firstScript
+                );
+            }
+
+        }(
+            window,
+            document,
+            'acDataLayer',
+            'ATM-3bV3KCGh1FIvljB56'
+        ));
+    </script>
+
+
+    <!-- ========================= -->
+    <!-- Стили страницы -->
+    <!-- ========================= -->
+
+    <style>
+
+        * {
+            box-sizing: border-box;
         }
-    });
-</script>
 
-<a href="books.html">Перейти к книгам</a>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            color: #222;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 60px 20px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 36px;
+            margin-bottom: 15px;
+        }
+
+        p {
+            font-size: 18px;
+            line-height: 1.5;
+            color: #555;
+        }
+
+        .buttons {
+            margin-top: 35px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        button,
+        .books-button {
+            display: inline-block;
+            padding: 14px 28px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        button {
+            background: #222;
+            color: white;
+        }
+
+        .books-button {
+            background: #e8e8e8;
+            color: #222;
+        }
+
+        button:hover,
+        .books-button:hover {
+            opacity: 0.8;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+    <div class="container">
+
+        <h1>Добро пожаловать!</h1>
+
+        <p>
+            Это тестовый сайт для проверки работы
+            Altcraft Tag Manager и пикселя.
+        </p>
+
+
+        <div class="buttons">
+
+            <!-- ========================= -->
+            <!-- Кнопка подписки на Push -->
+            <!-- ========================= -->
+
+            <button id="init_sub">
+                Подписаться на уведомления
+            </button>
+
+
+            <!-- ========================= -->
+            <!-- Переход на страницу книг -->
+            <!-- ========================= -->
+
+            <a
+                class="books-button"
+                href="books.html"
+            >
+                Перейти к книгам
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- ========================= -->
+    <!-- Altcraft Push -->
+    <!-- ========================= -->
+
+    <script src="https://pxl.demo.altcraft.com/ak_container.js?id=NjI1fDQ="></script>
+
+
+    <script>
+
+        document
+            .getElementById('init_sub')
+            .addEventListener('click', function () {
+
+                try {
+
+                    var akPush = new AKPush();
+
+                    akPush.initSubscription(
+                        {},
+                        {
+                            CRM_ID: 'abc'
+                        }
+                    );
+
+                } catch (e) {
+
+                    console.log(e);
+
+                }
+
+            });
+
+    </script>
+
+</body>
+</html>
