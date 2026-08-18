@@ -1,108 +1,13 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Подписка на push-уведомления</title>
-    <script src="https://pxl.demo.altcraft.com/ak_container.js?id=NjI1fDQ="></script>
-    <style>
-        /* ... ваши стили ... */
-        .status { /* ... */ }
-        .status.success { /* ... */ }
-        .status.error { /* ... */ }
-        .hint { /* ... */ }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h2>📨 Push-уведомления</h2>
-        <p>Подпишитесь, чтобы получать актуальные новости и предложения.</p>
-        <input type="email" id="emailInput" placeholder="Введите ваш email" value="test@example.com">
-        
-        <!-- Две кнопки с разными действиями -->
-        <button id="subscribeBtn">✅ Подписаться</button>
-        <button id="retryBtn">🔄 Попробовать снова</button>
-        
-        <div id="status" class="status">Введите email и нажмите «Подписаться»</div>
-        <div class="hint">
-            💡 Если вы ранее отклонили запрос, используйте «Попробовать снова»<br>
-            Или измените настройки уведомлений вручную в браузере.
-        </div>
-    </div>
+<button id="init_sub">Подписаться на уведомления</button> // Кнопка подписки
 
-    <script>
-        const statusEl = document.getElementById('status');
-        const emailInput = document.getElementById('emailInput');
-
-        function setStatus(message, type = '') {
-            statusEl.textContent = message;
-            statusEl.className = 'status ' + type;
-        }
-
-        // --- 1. Обычная подписка ---
-        document.getElementById('subscribeBtn').addEventListener('click', function() {
-            const email = emailInput.value.trim();
-            if (!email) {
-                setStatus('❌ Пожалуйста, введите email', 'error');
-                return;
-            }
-            setStatus('⏳ Запрос разрешения...');
-            try {
-                if (typeof AKPush === 'undefined') {
-                    setStatus('❌ Ошибка: SDK не загружен', 'error');
-                    return;
-                }
-                const akPush = new AKPush();
-                akPush.initSubscription(
-                    { email: email },
-                    {} // Можно добавить данные для профиля
-                );
-                setStatus('✅ Запрос отправлен! Разрешите уведомления в браузере.', 'success');
-            } catch (e) {
-                setStatus('❌ Ошибка: ' + e.message, 'error');
-                console.error(e);
-            }
-        });
-
-        // --- 2. Повторная попытка (с флагом inexclusive: true) ---
-        document.getElementById('retryBtn').addEventListener('click', function() {
-            const email = emailInput.value.trim();
-            if (!email) {
-                setStatus('❌ Пожалуйста, введите email', 'error');
-                return;
-            }
-            setStatus('⏳ Повторная попытка...');
-            try {
-                if (typeof AKPush === 'undefined') {
-                    setStatus('❌ Ошибка: SDK не загружен', 'error');
-                    return;
-                }
-                const akPush = new AKPush();
-                // Используем updateSubscription с inexclusive: true
-                akPush.updateSubscription(
-                    { email: email }, // match
-                    {},               // update — пустой объект
-                    true              // inexclusive: true
-                );
-                setStatus('🔄 Повторный запрос отправлен! Если браузер не показывает окно, измените настройки вручную.', 'success');
-            } catch (e) {
-                setStatus('❌ Ошибка: ' + e.message, 'error');
-                console.error(e);
-            }
-        });
-
-        // --- События SDK для отслеживания статуса ---
-        if (typeof AKPush !== 'undefined') {
-            AKPush.events.on('subscribe', (data) => {
-                setStatus('🎉 Подписка оформлена! Браузер: ' + data.browser, 'success');
-                console.log('Подписка успешна:', data);
-            });
-            AKPush.events.on('update_subscription', (data) => {
-                setStatus('🔄 Подписка обновлена! Браузер: ' + data.browser, 'success');
-                console.log('Подписка обновлена:', data);
-            });
-        }
-    </script>
-   
-</body>
-</html>
+<script>
+	document.getElementById('init_sub').addEventListener('click', function() { // По клику на кнопку..
+	try {
+		var akPush = new AKPush();
+		akPush.initSubscription() // Покажет форму для подписки
+		}
+	catch (e) {
+		console.log(e); // В случае ошибки выведет сообщение в консоль
+		}
+	});
+</script>
