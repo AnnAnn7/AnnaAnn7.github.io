@@ -4,166 +4,104 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Подписка на push-уведомления</title>
-
-    <!-- 1. Подключаем SDK Altcraft -->
     <script src="https://pxl.demo.altcraft.com/ak_container.js?id=NjI1fDQ="></script>
-
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            background-color: #f5f5f5;
-        }
-        .container {
-            background: white;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            text-align: center;
-            max-width: 400px;
-        }
-        button {
-            display: block;
-            width: 100%;
-            padding: 12px 20px;
-            margin: 10px 0;
-            font-size: 16px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            background: #6c4a3a;
-            color: white;
-            transition: opacity 0.2s;
-        }
-        button:hover {
-            opacity: 0.9;
-        }
-        .status {
-            margin-top: 15px;
-            padding: 10px;
-            border-radius: 6px;
-            background: #f0f0f0;
-            font-size: 14px;
-            min-height: 40px;
-        }
-        .status.success {
-            background: #d4edda;
-            color: #155724;
-        }
-        .status.error {
-            background: #f8d7da;
-            color: #721c24;
-        }
-        input {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 16px;
-            box-sizing: border-box;
-        }
-        .hint {
-            font-size: 14px;
-            color: #777;
-            margin-top: 10px;
-        }
+        /* ... ваши стили ... */
+        .status { /* ... */ }
+        .status.success { /* ... */ }
+        .status.error { /* ... */ }
+        .hint { /* ... */ }
     </style>
 </head>
 <body>
+    <div class="container">
+        <h2>📨 Push-уведомления</h2>
+        <p>Подпишитесь, чтобы получать актуальные новости и предложения.</p>
+        <input type="email" id="emailInput" placeholder="Введите ваш email" value="test@example.com">
+        
+        <!-- Две кнопки с разными действиями -->
+        <button id="subscribeBtn">✅ Подписаться</button>
+        <button id="retryBtn">🔄 Попробовать снова</button>
+        
+        <div id="status" class="status">Введите email и нажмите «Подписаться»</div>
+        <div class="hint">
+            💡 Если вы ранее отклонили запрос, используйте «Попробовать снова»<br>
+            Или измените настройки уведомлений вручную в браузере.
+        </div>
+    </div>
 
-<div class="container">
-    <h2>📨 Push-уведомления</h2>
-    <p>Подпишитесь, чтобы получать актуальные новости и предложения.</p>
+    <script>
+        const statusEl = document.getElementById('status');
+        const emailInput = document.getElementById('emailInput');
 
-    <!-- Поле для ввода email (нужен для поиска/создания профиля) -->
-    <input type="email" id="emailInput" placeholder="Введите ваш email" value="test@example.com">
-
-    <!-- Кнопка подписки -->
-    <button id="subscribeBtn">✅ Подписаться</button>
-
-    <!-- Блок для отображения статуса -->
-    <div id="status" class="status">Введите email и нажмите «Подписаться»</div>
-    <div class="hint">💡 Email нужен, чтобы Altcraft нашёл или создал ваш профиль</div>
-</div>
-
-<script>
-    // Элементы страницы
-    const statusEl = document.getElementById('status');
-    const emailInput = document.getElementById('emailInput');
-    const subscribeBtn = document.getElementById('subscribeBtn');
-
-    // Функция для обновления статуса
-    function setStatus(message, type = '') {
-        statusEl.textContent = message;
-        statusEl.className = 'status ' + type;
-    }
-
-    // Обработчик клика по кнопке
-    subscribeBtn.addEventListener('click', function() {
-        const email = emailInput.value.trim();
-
-        // Проверяем, что email введён
-        if (!email) {
-            setStatus('❌ Пожалуйста, введите email', 'error');
-            return;
+        function setStatus(message, type = '') {
+            statusEl.textContent = message;
+            statusEl.className = 'status ' + type;
         }
 
-        setStatus('⏳ Запрос разрешения...');
-
-        try {
-            // Проверяем, загрузился ли SDK
-            if (typeof AKPush === 'undefined') {
-                setStatus('❌ Ошибка: SDK не загружен', 'error');
+        // --- 1. Обычная подписка ---
+        document.getElementById('subscribeBtn').addEventListener('click', function() {
+            const email = emailInput.value.trim();
+            if (!email) {
+                setStatus('❌ Пожалуйста, введите email', 'error');
                 return;
             }
-
-            // Создаём экземпляр SDK
-            const akPush = new AKPush();
-
-            // Вызываем initSubscription с передачей email
-            // Параметр match — по нему Altcraft ищет профиль
-            // Параметр update — дополнительные данные, которые запишутся в профиль
-            akPush.initSubscription(
-                {
-                    email: email   // ← вот здесь передаётся email для поиска/создания профиля
-                },
-                {
-                    // Сюда можно добавить любые данные, которые вы хотите записать в профиль
-                    // Например: _fname: 'Имя', _lname: 'Фамилия'
-                    // Поля с подчёркиванием — это стандартные поля Altcraft
+            setStatus('⏳ Запрос разрешения...');
+            try {
+                if (typeof AKPush === 'undefined') {
+                    setStatus('❌ Ошибка: SDK не загружен', 'error');
+                    return;
                 }
-            );
+                const akPush = new AKPush();
+                akPush.initSubscription(
+                    { email: email },
+                    {} // Можно добавить данные для профиля
+                );
+                setStatus('✅ Запрос отправлен! Разрешите уведомления в браузере.', 'success');
+            } catch (e) {
+                setStatus('❌ Ошибка: ' + e.message, 'error');
+                console.error(e);
+            }
+        });
 
-            setStatus('✅ Запрос отправлен! Разрешите уведомления в браузере.', 'success');
-        } catch (e) {
-            setStatus('❌ Ошибка: ' + e.message, 'error');
-            console.error('Ошибка подписки:', e);
+        // --- 2. Повторная попытка (с флагом inexclusive: true) ---
+        document.getElementById('retryBtn').addEventListener('click', function() {
+            const email = emailInput.value.trim();
+            if (!email) {
+                setStatus('❌ Пожалуйста, введите email', 'error');
+                return;
+            }
+            setStatus('⏳ Повторная попытка...');
+            try {
+                if (typeof AKPush === 'undefined') {
+                    setStatus('❌ Ошибка: SDK не загружен', 'error');
+                    return;
+                }
+                const akPush = new AKPush();
+                // Используем updateSubscription с inexclusive: true
+                akPush.updateSubscription(
+                    { email: email }, // match
+                    {},               // update — пустой объект
+                    true              // inexclusive: true
+                );
+                setStatus('🔄 Повторный запрос отправлен! Если браузер не показывает окно, измените настройки вручную.', 'success');
+            } catch (e) {
+                setStatus('❌ Ошибка: ' + e.message, 'error');
+                console.error(e);
+            }
+        });
+
+        // --- События SDK для отслеживания статуса ---
+        if (typeof AKPush !== 'undefined') {
+            AKPush.events.on('subscribe', (data) => {
+                setStatus('🎉 Подписка оформлена! Браузер: ' + data.browser, 'success');
+                console.log('Подписка успешна:', data);
+            });
+            AKPush.events.on('update_subscription', (data) => {
+                setStatus('🔄 Подписка обновлена! Браузер: ' + data.browser, 'success');
+                console.log('Подписка обновлена:', data);
+            });
         }
-    });
-
-    // Подписка на события SDK (чтобы видеть, что происходит)
-    if (typeof AKPush !== 'undefined') {
-        AKPush.events.on('subscribe', (data) => {
-            setStatus('🎉 Подписка оформлена! Браузер: ' + data.browser, 'success');
-            console.log('Подписка успешна:', data);
-        });
-
-        AKPush.events.on('update_subscription', (data) => {
-            setStatus('🔄 Подписка обновлена! Браузер: ' + data.browser, 'success');
-            console.log('Подписка обновлена:', data);
-        });
-
-        AKPush.events.on('suspend_subscription', (data) => {
-            setStatus('⏸️ Подписка приостановлена', '');
-            console.log('Подписка приостановлена:', data);
-        });
-    }
-</script>
-
+    </script>
 </body>
 </html>
