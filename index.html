@@ -2,24 +2,25 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Заголовок страницы</title>
-    <script src="https://pxl.demo.altcraft.com/ak_container.js?id=NjI1fDQ=" ></script>
+    <title>Подписка на push</title>
+    <script src="https://pxl.demo.altcraft.com/ak_container.js?id=NjI1fDQ="></script>
 </head>
 <body>
-   
-<button id="init_sub">Подписаться на уведомления</button>
+    <button id="init_sub">Подписаться на уведомления</button>
 
-<script>
-    document.getElementById('init_sub').addEventListener('click', function() {
-        try {
-            const akPush = new AKPush();
-            akPush.initSubscription()
-        }
-        catch (e) {
-            console.log(e);
-        }
-    });
-</script>
-
+    <script>
+        document.getElementById('init_sub').addEventListener('click', function() {
+            try {
+                if (typeof AKPush === 'undefined') {
+                    console.error('AKPush не загружен');
+                    return;
+                }
+                const akPush = new AKPush();
+                akPush.initSubscription();
+            } catch (e) {
+                console.error('Ошибка подписки:', e);
+            }
+        });
+    </script>
 </body>
 </html>
