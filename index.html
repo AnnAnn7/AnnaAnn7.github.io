@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Подписка на push-уведомления</title>
-    <!-- Подключение SDK Altcraft -->
+
+    <!-- 1. Подключаем SDK Altcraft -->
     <script src="https://pxl.demo.altcraft.com/ak_container.js?id=NjI1fDQ="></script>
+
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -33,23 +35,12 @@
             border: none;
             border-radius: 8px;
             cursor: pointer;
+            background: #6c4a3a;
+            color: white;
             transition: opacity 0.2s;
         }
         button:hover {
             opacity: 0.9;
-        }
-        .btn-primary {
-            background: #6c4a3a;
-            color: white;
-        }
-        .btn-secondary {
-            background: #e0e0e0;
-            color: #333;
-        }
-        .hint {
-            font-size: 14px;
-            color: #777;
-            margin-top: 20px;
         }
         .status {
             margin-top: 15px;
@@ -67,6 +58,20 @@
             background: #f8d7da;
             color: #721c24;
         }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        .hint {
+            font-size: 14px;
+            color: #777;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -75,27 +80,41 @@
     <h2>📨 Push-уведомления</h2>
     <p>Подпишитесь, чтобы получать актуальные новости и предложения.</p>
 
-    <!-- Кнопка для первой подписки -->
-    <button id="subscribeBtn" class="btn-primary">✅ Подписаться</button>
+    <!-- Поле для ввода email (нужен для поиска/создания профиля) -->
+    <input type="email" id="emailInput" placeholder="Введите ваш email" value="test@example.com">
 
-    <!-- Кнопка для повторной попытки (если пользователь отказался) -->
-    <button id="retryBtn" class="btn-secondary">🔄 Попробовать снова</button>
+    <!-- Кнопка подписки -->
+    <button id="subscribeBtn">✅ Подписаться</button>
 
-    <div id="status" class="status">Нажмите «Подписаться», чтобы начать</div>
-    <div class="hint">💡 Если вы ранее отклонили запрос, используйте «Попробовать снова»</div>
+    <!-- Блок для отображения статуса -->
+    <div id="status" class="status">Введите email и нажмите «Подписаться»</div>
+    <div class="hint">💡 Email нужен, чтобы Altcraft нашёл или создал ваш профиль</div>
 </div>
 
 <script>
+    // Элементы страницы
+    const statusEl = document.getElementById('status');
+    const emailInput = document.getElementById('emailInput');
+    const subscribeBtn = document.getElementById('subscribeBtn');
+
     // Функция для обновления статуса
     function setStatus(message, type = '') {
-        const statusEl = document.getElementById('status');
         statusEl.textContent = message;
         statusEl.className = 'status ' + type;
     }
 
-    // --- 1. Обычная подписка ---
-    document.getElementById('subscribeBtn').addEventListener('click', function() {
+    // Обработчик клика по кнопке
+    subscribeBtn.addEventListener('click', function() {
+        const email = emailInput.value.trim();
+
+        // Проверяем, что email введён
+        if (!email) {
+            setStatus('❌ Пожалуйста, введите email', 'error');
+            return;
+        }
+
         setStatus('⏳ Запрос разрешения...');
+
         try {
             // Проверяем, загрузился ли SDK
             if (typeof AKPush === 'undefined') {
@@ -103,12 +122,23 @@
                 return;
             }
 
+            // Создаём экземпляр SDK
             const akPush = new AKPush();
-            // Вызываем initSubscription — показывает стандартный запрос браузера
+
+            // Вызываем initSubscription с передачей email
+            // Параметр match — по нему Altcraft ищет профиль
+            // Параметр update — дополнительные данные, которые запишутся в профиль
             akPush.initSubscription(
-                {},  // match — пустой, ищем профиль по умолчанию
-                {}   // update — пустой, не обновляем данные
+                {
+                    email: email   // ← вот здесь передаётся email для поиска/создания профиля
+                },
+                {
+                    // Сюда можно добавить любые данные, которые вы хотите записать в профиль
+                    // Например: _fname: 'Имя', _lname: 'Фамилия'
+                    // Поля с подчёркиванием — это стандартные поля Altcraft
+                }
             );
+
             setStatus('✅ Запрос отправлен! Разрешите уведомления в браузере.', 'success');
         } catch (e) {
             setStatus('❌ Ошибка: ' + e.message, 'error');
@@ -116,32 +146,7 @@
         }
     });
 
-    // --- 2. Повторная попытка (если пользователь отказался) ---
-    document.getElementById('retryBtn').addEventListener('click', function() {
-        setStatus('⏳ Повторная попытка...');
-        try {
-            if (typeof AKPush === 'undefined') {
-                setStatus('❌ Ошибка: SDK не загружен', 'error');
-                return;
-            }
-
-            const akPush = new AKPush();
-            // Вызываем updateSubscription с inexclusive: true
-            // Это эквивалентно initSubscription и снова запросит разрешение
-            akPush.updateSubscription(
-                {},   // match — пустой
-                {},   // update — пустой объект обязателен, если не обновляем данные
-                true  // inexclusive: true — принудительно пытаемся подписать заново
-            );
-            setStatus('✅ Повторный запрос отправлен! Разрешите уведомления в браузере.', 'success');
-        } catch (e) {
-            setStatus('❌ Ошибка: ' + e.message, 'error');
-            console.error('Ошибка повторной подписки:', e);
-        }
-    });
-
-    // --- Подписка на события SDK (для отслеживания статуса) ---
-    // Эти события срабатывают, когда пользователь что-то делает с уведомлениями
+    // Подписка на события SDK (чтобы видеть, что происходит)
     if (typeof AKPush !== 'undefined') {
         AKPush.events.on('subscribe', (data) => {
             setStatus('🎉 Подписка оформлена! Браузер: ' + data.browser, 'success');
